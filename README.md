@@ -1,4 +1,4 @@
-# EpiCheck
+# EpiCheck: Um simulador epidemiológico
 ---
 
 ## Tecnologias utilizadas
