@@ -1,7 +1,7 @@
-# EpiCheck: Um simulador epidemiológico
+# EpiCheck: Um Simulador Epidemiológico
 ---
 
-## Tecnologias utilizadas
+1. Tecnologias utilizadas
 
 O EpiCheck foi construído inteiramente como um widget HTML/CSS/JavaScript renderizado inline no chat, usando:
 
@@ -12,7 +12,7 @@ O EpiCheck foi construído inteiramente como um widget HTML/CSS/JavaScript rende
 
 ---
 
-## Como o modelo SEIR funciona
+2. Como o modelo SEIR funciona
 
 O SEIR é um modelo compartimental: divide a população em quatro grupos que evoluem ao longo do tempo segundo equações diferenciais ordinárias.
 
@@ -36,5 +36,9 @@ dR/dt =  γ·I
 Os três parâmetros centrais são **β** (taxa de transmissão por contato), **σ** (taxa de progressão da incubação) e **γ** (taxa de recuperação). A partir deles se calcula o número reprodutivo básico **R₀ = β / γ**: se R₀ > 1, a epidemia se propaga; se R₀ < 1, ela se extingue naturalmente.
 
 Experimente os presets de **Influenza**, **COVID-19**, **Sarampo** e **Ebola** para ver como doenças com parâmetros distintos produzem curvas completamente diferentes.
+
+3. Limitações
+O EpiCheck é uma simulação simplificada, desconsiderando aspectos como ações humanas, diversidade populacional, etc.
+Ferramentas como o EpiCheck são úteis pelo ponto de vista educacional/pedagógico, mas não devem ser utilizadas isoladamente como base empírica para a tomada de decisões sociopolíticas.
 
 Criado com Claude.AI
