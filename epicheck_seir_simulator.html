@@ -1,0 +1,245 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); color: var(--color-text-primary); }
+  .app { padding: 1rem 0; }
+  .header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
+  .logo { width: 36px; height: 36px; border-radius: 8px; background: #1D9E75; display: flex; align-items: center; justify-content: center; }
+  .logo i { color: #fff; font-size: 20px; }
+  .title { font-size: 20px; font-weight: 500; }
+  .subtitle { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; }
+  .layout { display: grid; grid-template-columns: 220px 1fr; gap: 1.25rem; }
+  .panel { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; }
+  .panel-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 1rem; }
+  .control-group { margin-bottom: 1rem; }
+  .control-label { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--color-text-secondary); margin-bottom: 4px; }
+  .control-label span { font-weight: 500; color: var(--color-text-primary); font-size: 13px; }
+  input[type=range] { width: 100%; }
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 1.25rem; }
+  .metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem; text-align: center; }
+  .metric-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
+  .metric-value { font-size: 18px; font-weight: 500; }
+  .metric-value.s { color: #888780; }
+  .metric-value.e { color: #BA7517; }
+  .metric-value.i { color: #A32D2D; }
+  .metric-value.r { color: #1D9E75; }
+  .chart-wrap { position: relative; width: 100%; height: 280px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; font-size: 12px; color: var(--color-text-secondary); }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .dot { width: 10px; height: 10px; border-radius: 2px; }
+  .preset-row { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
+  .preset-btn { font-size: 11px; padding: 4px 8px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-secondary); color: var(--color-text-secondary); cursor: pointer; transition: background 0.15s; }
+  .preset-btn:hover { background: var(--color-background-tertiary); }
+  .divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 0.75rem 0; }
+  .peak-info { font-size: 12px; color: var(--color-text-secondary); margin-top: 0.5rem; }
+  .peak-info strong { color: #A32D2D; }
+</style>
+
+<div class="app">
+  <div class="header">
+    <div class="logo"><i class="ti ti-virus" aria-hidden="true"></i></div>
+    <div>
+      <div class="title">EpiCheck</div>
+      <div class="subtitle">Simulador epidemiológico — modelo SEIR</div>
+    </div>
+  </div>
+
+  <div class="preset-row">
+    <button class="preset-btn" onclick="loadPreset('influenza')">Influenza sazonal</button>
+    <button class="preset-btn" onclick="loadPreset('covid')">COVID-19</button>
+    <button class="preset-btn" onclick="loadPreset('sarampo')">Sarampo</button>
+    <button class="preset-btn" onclick="loadPreset('ebola')">Ebola</button>
+  </div>
+
+  <div class="layout">
+    <div class="panel">
+      <div class="panel-title">Parâmetros</div>
+
+      <div class="control-group">
+        <div class="control-label">População total <span id="lbl-N">100.000</span></div>
+        <input type="range" min="10000" max="1000000" step="10000" value="100000" id="sl-N" oninput="update()">
+      </div>
+      <div class="control-group">
+        <div class="control-label">Infectados iniciais <span id="lbl-I0">10</span></div>
+        <input type="range" min="1" max="500" step="1" value="10" id="sl-I0" oninput="update()">
+      </div>
+
+      <hr class="divider">
+
+      <div class="control-group">
+        <div class="control-label">Taxa de transmissão β <span id="lbl-b">0.30</span></div>
+        <input type="range" min="0.05" max="1.5" step="0.01" value="0.30" id="sl-b" oninput="update()">
+      </div>
+      <div class="control-group">
+        <div class="control-label">Taxa de incubação σ <span id="lbl-s">0.20</span></div>
+        <input type="range" min="0.05" max="0.50" step="0.01" value="0.20" id="sl-s" oninput="update()">
+      </div>
+      <div class="control-group">
+        <div class="control-label">Taxa de recuperação γ <span id="lbl-g">0.10</span></div>
+        <input type="range" min="0.02" max="0.50" step="0.01" value="0.10" id="sl-g" oninput="update()">
+      </div>
+
+      <hr class="divider">
+
+      <div class="control-group">
+        <div class="control-label">Dias simulados <span id="lbl-D">180</span></div>
+        <input type="range" min="30" max="500" step="10" value="180" id="sl-D" oninput="update()">
+      </div>
+
+      <hr class="divider">
+
+      <div style="font-size:12px; color: var(--color-text-secondary); line-height:1.5;">
+        <strong style="color:var(--color-text-primary)">R₀</strong> = β / γ &nbsp;=&nbsp; <strong id="r0-val" style="color:#1D9E75">—</strong><br>
+        <span style="font-size:11px;">R₀ &gt; 1 → epidemia se propaga</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">Suscetíveis</div><div class="metric-value s" id="m-S">—</div></div>
+        <div class="metric"><div class="metric-label">Expostos</div><div class="metric-value e" id="m-E">—</div></div>
+        <div class="metric"><div class="metric-label">Infectados</div><div class="metric-value i" id="m-I">—</div></div>
+        <div class="metric"><div class="metric-label">Recuperados</div><div class="metric-value r" id="m-R">—</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="legend">
+          <span><span class="dot" style="background:#888780"></span>Suscetíveis (S)</span>
+          <span><span class="dot" style="background:#EF9F27"></span>Expostos (E)</span>
+          <span><span class="dot" style="background:#E24B4A"></span>Infectados (I)</span>
+          <span><span class="dot" style="background:#1D9E75"></span>Recuperados (R)</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="mainChart" role="img" aria-label="Curvas SEIR ao longo do tempo">Gráfico de simulação SEIR.</canvas>
+        </div>
+        <div class="peak-info" id="peak-info"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+let chart;
+
+function fmt(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(2) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(1) + 'k';
+  return Math.round(n).toString();
+}
+
+function fmtPct(v, N) { return (v/N*100).toFixed(1) + '%'; }
+
+function runSEIR(N, I0, beta, sigma, gamma, days) {
+  let S = N - I0, E = 0, I = I0, R = 0;
+  const rs = [S], re = [E], ri = [I], rr = [R];
+  for (let d = 0; d < days; d++) {
+    const dS = -beta * S * I / N;
+    const dE = beta * S * I / N - sigma * E;
+    const dI = sigma * E - gamma * I;
+    const dR = gamma * I;
+    S = Math.max(0, S + dS);
+    E = Math.max(0, E + dE);
+    I = Math.max(0, I + dI);
+    R = Math.max(0, R + dR);
+    rs.push(S); re.push(E); ri.push(I); rr.push(R);
+  }
+  return { S: rs, E: re, I: ri, R: rr };
+}
+
+function update() {
+  const N = +document.getElementById('sl-N').value;
+  const I0 = +document.getElementById('sl-I0').value;
+  const beta = +document.getElementById('sl-b').value;
+  const sigma = +document.getElementById('sl-s').value;
+  const gamma = +document.getElementById('sl-g').value;
+  const days = +document.getElementById('sl-D').value;
+
+  document.getElementById('lbl-N').textContent = fmt(N);
+  document.getElementById('lbl-I0').textContent = I0;
+  document.getElementById('lbl-b').textContent = beta.toFixed(2);
+  document.getElementById('lbl-s').textContent = sigma.toFixed(2);
+  document.getElementById('lbl-g').textContent = gamma.toFixed(2);
+  document.getElementById('lbl-D').textContent = days;
+
+  const R0 = (beta / gamma).toFixed(2);
+  const r0el = document.getElementById('r0-val');
+  r0el.textContent = R0;
+  r0el.style.color = R0 > 1 ? '#E24B4A' : '#1D9E75';
+
+  const res = runSEIR(N, I0, beta, sigma, gamma, days);
+  const labels = Array.from({length: days+1}, (_,i) => i);
+
+  const lastIdx = days;
+  document.getElementById('m-S').textContent = fmtPct(res.S[lastIdx], N);
+  document.getElementById('m-E').textContent = fmtPct(res.E[lastIdx], N);
+  document.getElementById('m-I').textContent = fmtPct(res.I[lastIdx], N);
+  document.getElementById('m-R').textContent = fmtPct(res.R[lastIdx], N);
+
+  const peakI = Math.max(...res.I);
+  const peakDay = res.I.indexOf(peakI);
+  document.getElementById('peak-info').innerHTML =
+    `Pico de infectados: <strong>${fmtPct(peakI, N)} (${fmt(peakI)} pessoas)</strong> no dia ${peakDay}`;
+
+  const step = Math.max(1, Math.floor(days / 120));
+  const lbl = labels.filter((_,i) => i % step === 0);
+  const sS = res.S.filter((_,i) => i % step === 0);
+  const sE = res.E.filter((_,i) => i % step === 0);
+  const sI = res.I.filter((_,i) => i % step === 0);
+  const sR = res.R.filter((_,i) => i % step === 0);
+
+  if (chart) {
+    chart.data.labels = lbl;
+    chart.data.datasets[0].data = sS;
+    chart.data.datasets[1].data = sE;
+    chart.data.datasets[2].data = sI;
+    chart.data.datasets[3].data = sR;
+    chart.update('none');
+  } else {
+    chart = new Chart(document.getElementById('mainChart'), {
+      type: 'line',
+      data: {
+        labels: lbl,
+        datasets: [
+          { label: 'Suscetíveis', data: sS, borderColor: '#888780', backgroundColor: 'rgba(136,135,128,0.08)', borderWidth: 2, pointRadius: 0, fill: true },
+          { label: 'Expostos',    data: sE, borderColor: '#EF9F27', backgroundColor: 'rgba(239,159,39,0.08)',  borderWidth: 2, pointRadius: 0, fill: true },
+          { label: 'Infectados',  data: sI, borderColor: '#E24B4A', backgroundColor: 'rgba(226,75,74,0.12)',   borderWidth: 2.5, pointRadius: 0, fill: true },
+          { label: 'Recuperados', data: sR, borderColor: '#1D9E75', backgroundColor: 'rgba(29,158,117,0.08)', borderWidth: 2, pointRadius: 0, fill: true },
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { display: false }, tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)} (${(ctx.parsed.y/N*100).toFixed(1)}%)`
+          }
+        }},
+        scales: {
+          x: { title: { display: true, text: 'Dias', color: '#888', font: { size: 11 } }, ticks: { color: '#888', font: { size: 10 }, maxTicksLimit: 10 }, grid: { color: 'rgba(128,128,128,0.1)' } },
+          y: { title: { display: true, text: 'Pessoas', color: '#888', font: { size: 11 } }, ticks: { color: '#888', font: { size: 10 }, callback: v => fmt(v) }, grid: { color: 'rgba(128,128,128,0.1)' } }
+        }
+      }
+    });
+  }
+}
+
+function loadPreset(name) {
+  const presets = {
+    influenza: { b: 0.30, s: 0.20, g: 0.14, D: 180 },
+    covid:     { b: 0.25, s: 0.14, g: 0.07, D: 300 },
+    sarampo:   { b: 1.00, s: 0.14, g: 0.07, D: 120 },
+    ebola:     { b: 0.10, s: 0.10, g: 0.09, D: 200 },
+  };
+  const p = presets[name];
+  if (!p) return;
+  document.getElementById('sl-b').value = p.b;
+  document.getElementById('sl-s').value = p.s;
+  document.getElementById('sl-g').value = p.g;
+  document.getElementById('sl-D').value = p.D;
+  update();
+}
+
+update();
+</script>
