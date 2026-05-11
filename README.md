@@ -38,6 +38,7 @@ Os três parâmetros centrais são **β** (taxa de transmissão por contato), **
 Experimente os presets de **Influenza**, **COVID-19**, **Sarampo** e **Ebola** para ver como doenças com parâmetros distintos produzem curvas completamente diferentes.
 
 3. Limitações
+
 O EpiCheck é uma simulação simplificada, desconsiderando aspectos como ações humanas, diversidade populacional, etc.
 Ferramentas como o EpiCheck são úteis pelo ponto de vista educacional/pedagógico, mas não devem ser utilizadas isoladamente como base empírica para a tomada de decisões sociopolíticas.
 
