@@ -36,3 +36,4 @@ dR/dt =  γ·I
 Os três parâmetros centrais são **β** (taxa de transmissão por contato), **σ** (taxa de progressão da incubação) e **γ** (taxa de recuperação). A partir deles se calcula o número reprodutivo básico **R₀ = β / γ**: se R₀ > 1, a epidemia se propaga; se R₀ < 1, ela se extingue naturalmente.
 
 Experimente os presets de **Influenza**, **COVID-19**, **Sarampo** e **Ebola** para ver como doenças com parâmetros distintos produzem curvas completamente diferentes.
+Criado com Claude.AI
